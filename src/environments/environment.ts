@@ -3,7 +3,18 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  username: "AA0001986140",
+  rootPath: window["rootPath"],
+  rootPathApi: window["rootPathApi"],
+  rootPath3: window["rootPath3"],
+  rootPath2: window["rootPath2"],
+  PaymentReportPath: window["PaymentReportPath"],
+  phisicalPath: "./assets/i18n/",
+  formPath: window["formPath"],
+  imagepathclock: window["_imagepathclock"],
+  EmployeeReportPath: window["EmployeeReportPath"],
+  Lang: "10D04E8B-3361-E111-95D5-00E04C05559B",
 };
 
 /*
