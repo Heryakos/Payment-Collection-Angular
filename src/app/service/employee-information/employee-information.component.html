@@ -1,0 +1,395 @@
+<div class="card">
+  <div class="header">
+    <h2 class="text-center">Payment Collation</h2>
+  </div>
+  <div>
+    <hr />
+    <div class="container">
+      <button
+        type="button"
+        class="btn btn-info mr-2"
+        (click)="displayu = true"
+        translate
+      >
+        <i class="fa fa-file-excel-o"></i> Import From Excel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary mr-2"
+        (click)="CheckBank()"
+        translate
+      >
+        Check inserted data
+      </button>
+
+      <button
+        *ngIf="duplicateEmployees.length > 0"
+        type="button"
+        class="btn btn-warning mr-2"
+        label="Show Duplicates"
+        (click)="displayDialog = true"
+      >
+        Show Duplicates
+      </button>
+      <button
+        *ngIf="selectedRows.length > 0"
+        type="button"
+        pButton
+        class="btn btn-success mr-2"
+        id="log"
+        (click)="showDialog()"
+        label="Selected Rows"
+      ></button>
+
+      <p-dialog
+        header="Rent receivable"
+        [(visible)]="displayCheckBankDialog"
+        [modal]="true"
+        [style]="{ width: '75vw' }"
+      >
+        <div>
+          <form [formGroup]="searchForm">
+            <div class="p-grid p-align-center p-justify-between">
+              <div class="p-col">
+                <p-inputText type="text" placeholder="Search..."></p-inputText>
+                <!-- formControlName="searchTerm" -->
+              </div>
+              <div class="p-col">
+                <p>Total Rows: {{ bankname.length }}</p>
+              </div>
+            </div>
+          </form>
+          <p-table
+            [value]="bankname"
+            [paginator]="true"
+            [rows]="5"
+            [rowsPerPageOptions]="[5, 10, 25, 50]"
+            [globalFilterFields]="[
+              'orderid',
+              'trans_initate_time',
+              'top_short_code',
+              'short_code',
+              'biz_org_name',
+              'trans_status',
+              'debit_party_mnemonic',
+              'credit_party_mnemonic',
+              'amount',
+              'billReferenceNumber',
+              'bank_name'
+            ]"
+            [filterDelay]="500"
+            [responsive]="true"
+            [resizableColumns]="true"
+            (onSort)="highlightColumn($event)"
+            [sortField]="sortField"
+            [sortOrder]="sortOrder"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>#</th>
+                <th pSortableColumn="orderid">
+                  orderid <p-sortIcon field="orderid"></p-sortIcon>
+                </th>
+                <th pSortableColumn="short_code">
+                  short_code <p-sortIcon field="short_code"></p-sortIcon>
+                </th>
+                <th pSortableColumn="amount">
+                  amount <p-sortIcon field="amount"></p-sortIcon>
+                </th>
+                <th pSortableColumn="billReferenceNumber">
+                  billReferenceNumber
+                  <p-sortIcon field="billReferenceNumber"></p-sortIcon>
+                </th>
+                <th pSortableColumn="bank_name">
+                  Bank Name <p-sortIcon field="bank_name"></p-sortIcon>
+                </th>
+                <th>Actions</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+              <tr [ngClass]="{ red: rowData.isPaid }">
+                <td>{{ rowIndex + 1 }}</td>
+                <td>{{ rowData.orderid }}</td>
+                <td>{{ rowData.short_code }}</td>
+                <td>{{ rowData.amount }}</td>
+                <td>{{ rowData.billReferenceNumber }}</td>
+                <td>{{ rowData.bank_name }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    (click)="SPBank(rowData)"
+                    [disabled]="rowData.isPaid"
+                  >
+                    Pay
+                  </button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-dialog>
+
+      <div class="row">
+        <div class="col-md-4 form-group">
+          <p-dialog
+            header="Selected Rows"
+            [(visible)]="display"
+            [modal]="true"
+            [style]="{ width: '75vw' }"
+          >
+            <p-table
+              [paginator]="true"
+              [rows]="10"
+              [rowsPerPageOptions]="[5, 10, 25, 50]"
+              *ngIf="selectedRows && selectedRows.length"
+              [value]="selectedRows"
+              [(selection)]="selectedRowsForpay"
+            >
+              <ng-template pTemplate="header" let-rowData>
+                <tr
+                  [pSelectableRow]="rowData"
+                  [class.selected]="selectedRowsForpay.includes(rowData)"
+                >
+                  <th style="width: 3em">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                  </th>
+
+                  <th>orderid</th>
+                  <!-- <th>trans_initate_time</th>
+                  <th>top_short_code</th>
+                  <th>top_short_code</th>
+                  <th>biz_org_name</th>-->
+                  <th>trans_status</th>
+                  <th>debit_party_mnemonic</th>
+                  <th>credit_party_mnemonic</th>
+                  <th>amount</th>
+                  <th>billReferenceNumber</th>
+                  <th>Bank Name</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-rowData>
+                <tr>
+                  <td>
+                    <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+                  </td>
+
+                  <td>{{ rowData.orderid }}</td>
+                  <!-- <td>{{ rowData.trans_initate_time }}</td>
+                  <td>{{ rowData.top_short_code }}</td>
+                  <td>{{ rowData.short_code }}</td>
+                  <td>{{ rowData.biz_org_name }}</td> -->
+                  <td>{{ rowData.trans_status }}</td>
+                  <td>{{ rowData.debit_party_mnemonic }}</td>
+                  <td>{{ rowData.credit_party_mnemonic }}</td>
+                  <td>{{ rowData.amount }}</td>
+                  <td>{{ rowData.billReferenceNumber }}</td>
+                  <td>{{ rowData.bank_name }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+
+            <div class="float-right">
+              <button
+                type="button"
+                class="btn btn-success mr-2"
+                (click)="Payment()"
+                *ngIf="selectedRowsForpay.length"
+                translate
+              >
+                Inserted
+              </button>
+            </div>
+          </p-dialog>
+        </div>
+        <div class="cl-md-4 form-group">
+          <!-- Duplicate Table -->
+          <p-dialog
+            header="Duplicate Entries"
+            [(visible)]="displayDialog"
+            [modal]="true"
+            [style]="{ width: '70vw' }"
+          >
+            <div class="dialog-header">
+              <button
+                type="button"
+                class="btn btn-success"
+                (click)="exportSingle()"
+              >
+                Export to Excel
+              </button>
+            </div>
+            <p-table
+              id="data-table"
+              #duplicateTable
+              [value]="duplicateEmployees"
+              [paginator]="true"
+              [rows]="5"
+              [showCurrentPageReport]="true"
+              [tableStyle]="{ 'min-width': '50rem' }"
+              [globalFilterFields]="[
+                'orderid',
+                'trans_initate_time',
+                'trans_status.name',
+                'billReferenceNumber'
+              ]"
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+              [rowsPerPageOptions]="[5, 10, 25, 50]"
+              [(selection)]="selectedRows"
+            >
+              <ng-template pTemplate="caption">
+                <div class="flex">
+                  <span class="p-input-icon-left ml-auto">
+                    <div style="width: 40%">
+                      <i class="pi pi-search"></i>
+                      <input
+                        class="form-control"
+                        (input)="
+                          duplicateTable.filterGlobal(
+                            $event.target.value,
+                            'contains'
+                          )
+                        "
+                        placeholder="Search Globally"
+                      />
+                    </div>
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr>
+                  <!-- <th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                  </th> -->
+                  <th>orderid</th>
+                  <!-- <th>trans_initate_time</th>
+                  <th>top_short_code</th>
+                  <th>short_code</th>
+                  <th>biz_org_name</th>
+                  <th>trans_status</th> -->
+                  <th>debit_party_mnemonic</th>
+                  <th>credit_party_mnemonic</th>
+                  <th>amount</th>
+                  <th>billReferenceNumber</th>
+                  <th>Bank name</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-rowData>
+                <tr
+                  [pSelectableRow]="rowData"
+                  [class.selected]="selectedRows.includes(rowData)"
+                  [ngClass]="{ 'duplicate-row': true }"
+                >
+                  <!-- <td>
+                    <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+                  </td> -->
+                  <td>{{ rowData.orderid }}</td>
+                  <!-- <td>{{ rowData.trans_initate_time }}</td>
+                  <td>{{ rowData.top_short_code }}</td>
+                  <td>{{ rowData.short_code }}</td>
+                  <td>{{ rowData.biz_org_name }}</td> -->
+                  <td>{{ rowData.trans_status }}</td>
+                  <td>{{ rowData.debit_party_mnemonic }}</td>
+                  <td>{{ rowData.credit_party_mnemonic }}</td>
+                  <td>{{ rowData.amount }}</td>
+                  <td>{{ rowData.billReferenceNumber }}</td>
+                  <td>{{ rowData.bank_name }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-dialog>
+        </div>
+      </div>
+      <p-table
+        #rolelisttable
+        [value]="uniqueEmployees"
+        [paginator]="true"
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [globalFilterFields]="[
+          'orderid',
+          'trans_initate_time',
+          'trans_status.name',
+          'billReferenceNumber'
+        ]"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[5, 10, 25, 50]"
+        [(selection)]="selectedRows"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex">
+            <span class="p-input-icon-left ml-auto">
+              <div style="width: 40%">
+                <i class="pi pi-search"></i>
+                <input
+                  class="form-control"
+                  (input)="
+                    rolelisttable.filterGlobal($event.target.value, 'contains')
+                  "
+                  placeholder="Search Globally"
+                />
+              </div>
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th>orderid</th>
+            <th>short_code</th>
+            <th>trans_status</th>
+            <th>amount</th>
+            <th>billReferenceNumber</th>
+            <th>bank_name</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowData>
+          <tr
+            [pSelectableRow]="rowData"
+            [ngClass]="{
+              blue: rowData.isdupl === true,
+              red: rowData.isred === true
+            }"
+            (click)="checkDis(isdiabled)"
+          >
+            <td>
+              <p-tableCheckbox
+                [value]="rowData"
+                #isdiabled
+                [disabled]="rowData.isdupl === true"
+              ></p-tableCheckbox>
+            </td>
+            <td>{{ rowData.orderid }}</td>
+            <td>{{ rowData.short_code }}</td>
+            <td>{{ rowData.trans_status }}</td>
+            <td>{{ rowData.amount }}</td>
+            <td>{{ rowData.billReferenceNumber }}</td>
+            <td>{{ rowData.bank_name }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<p-dialog
+  header="Import from excel"
+  [(visible)]="displayu"
+  [style]="{ width: '55vw' }"
+  [positionTop]="1"
+>
+  <app-fileuploader (fileDropped)="onFileDropped($event)"></app-fileuploader>
+  <div class="float-right">
+    <p-button
+      icon="pi pi-check"
+      (click)="displayu = false"
+      label="Close"
+      styleClass="p-button-text"
+    ></p-button>
+  </div>
+</p-dialog>
+
+<simple-notifications></simple-notifications>

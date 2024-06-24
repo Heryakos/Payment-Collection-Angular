@@ -1,0 +1,66 @@
+.btn-primary2 {
+  height: 28px;
+  font-size: 12px;
+  padding-top: -10px;
+  padding-bottom: 10px;
+}
+.onhover:focus {
+  color: white;
+  background-color: green;
+}
+::ng-deep .modal-dialog {
+  max-width: 1400px !important;
+  width: 1400px;
+}
+.loading-spinner-container {
+  color: green;
+}
+tr.blue {
+  background-color: #1100ff !important;
+  color: rgb(255, 255, 255) !important;
+}
+tr.red {
+  background-color: #e12600 !important;
+  color: rgb(255, 255, 255) !important;
+}
+.button-container {
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+  margin-top: 20px;
+  margin-left: 100px;
+}
+.header {
+  background-color: rgb(78, 78, 214);
+  color: white;
+  padding: 10px;
+}
+/* .leave-labels {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; 
+    margin-right: 10px;
+}
+
+.leave-label {
+    margin-bottom: 10px; 
+}
+
+.leaveinput-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.leaveform-control-sm {
+    width: 80px; 
+    margin-right: 10px; 
+} */
+/* styles.css or component-specific CSS file */
+
+.p-table th.highlight {
+  background-color: #d1e7dd; /* light green background color */
+  color: #0f5132; /* dark green text color */
+}
